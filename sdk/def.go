@@ -14,7 +14,7 @@ const (
 	UNSET_LEASE = -1
 	NONE_TTL    = 0
 
-	DefaultListenAddress      = ":8926"
+	DefaultListenAddress      = ":8962"
 	DefaultEngine             = "file"
 	DefaultDataPath           = "./.data/dump"
 	DefaultKeyDiscardInterval = 10 * time.Second
