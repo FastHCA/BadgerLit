@@ -1,0 +1,8 @@
+Engine: file
+DataPath: ./.data/dump
+KeyDiscardInterval: 10s
+KeyDiscardRatio: 0.7
+LogFlags:
+  - default
+  - msgprefix
+  - utc

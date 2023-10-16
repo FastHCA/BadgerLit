@@ -16,7 +16,7 @@ func TestDB(t *testing.T) {
 		DataPath:           "./.data/dump",
 		KeyDiscardInterval: 5 * time.Second,
 		KeyDiscardRatio:    0.7,
-		LogFlagTokens:      strings.Split("default,msgprefix", ","),
+		LogFlagsToken:      strings.Split("default,msgprefix", ","),
 	}
 
 	db := badger.New(&config)

@@ -11,6 +11,9 @@ const (
 	ErrDatabaseUnavailable = Error("database is unavailable")
 	ErrNil                 = Error("nil")
 
+	UNSET_LEASE = -1
+	NONE_TTL    = 0
+
 	DefaultLogFlags = log.Lmsgprefix | log.LstdFlags
 
 	LOG_FLAG_TOKEN_DATE      = "date"

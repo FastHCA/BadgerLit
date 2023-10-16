@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Bofry/config"
 	"github.com/tidwall/resp"
 )
 
@@ -20,17 +21,18 @@ func main() {
 		db   sdk.Storage
 	)
 
-	config := sdk.Config{
-		Engine:             "file",
-		DataPath:           "./.data/dump",
-		KeyDiscardInterval: 10 * time.Second,
-		KeyDiscardRatio:    0.7,
-		LogFlagTokens:      strings.Split("default,msgprefix", ","),
-	}
-	db = badger.New(&config)
+	conf := sdk.Config{}
+
+	// load config
+	config.NewConfigurationService(&conf).
+		LoadYamlFile(`config.yaml`).Output()
+
+	// setup storage
+	db = badger.New(&conf)
 	db.Start(context.Background())
 	defer db.Stop(context.Background())
 
+	// setup server
 	s := resp.NewServer()
 
 	s.HandleFunc("Del", func(conn *resp.Conn, args []resp.Value) bool {
@@ -202,18 +204,18 @@ func main() {
 			ok, ttl, err := db.Ttl(name)
 			if err != nil {
 				conn.WriteError(err)
-				return true
-			}
-
-			if !ok {
-				conn.WriteInteger(-2)
 			} else {
-				if ttl < 0 {
-					conn.WriteInteger(-1)
+				if !ok {
+					conn.WriteInteger(-2)
 				} else {
-					conn.WriteInteger(int(ttl))
+					if ttl < 0 {
+						conn.WriteInteger(-1)
+					} else {
+						conn.WriteInteger(int(ttl))
+					}
 				}
 			}
+
 		}
 		return true
 	})

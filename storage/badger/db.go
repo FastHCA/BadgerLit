@@ -350,14 +350,18 @@ func (db *DB) Ttl(key []byte) (ok bool, ttl int64, err error) {
 
 	if err != nil {
 		if errors.Is(err, badger.ErrKeyNotFound) {
-			return false, 0, nil
+			return false, sdk.NONE_TTL, nil
 		}
-		return false, 0, err
+		return false, sdk.NONE_TTL, err
+	}
+
+	if expireAt == 0 {
+		return true, sdk.UNSET_LEASE, nil
 	}
 
 	var now uint64 = uint64(time.Now().Unix())
-	if now < expireAt {
-		return true, -int64(expireAt - now), nil
+	if now > expireAt {
+		return false, sdk.NONE_TTL, nil
 	}
-	return true, int64(now - expireAt), nil
+	return true, int64(expireAt - now), nil
 }

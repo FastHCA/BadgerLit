@@ -7,20 +7,20 @@ import (
 )
 
 type Config struct {
-	Engine             string // file, memory
-	DataPath           string
-	KeyDiscardInterval time.Duration
-	KeyDiscardRatio    float64
-	LogFlagTokens      []string
+	Engine             string        `yaml:"Engine"`
+	DataPath           string        `yaml:"DataPath"`
+	KeyDiscardInterval time.Duration `yaml:"KeyDiscardInterval"`
+	KeyDiscardRatio    float64       `yaml:"KeyDiscardRatio"`
+	LogFlagsToken      []string      `yaml:"LogFlags"`
 }
 
 func (conf *Config) LogFlags() (int, error) {
-	if len(conf.LogFlagTokens) == 0 {
+	if len(conf.LogFlagsToken) == 0 {
 		return DefaultLogFlags, nil
 	}
 
 	var (
-		tokens []string = conf.LogFlagTokens
+		tokens []string = conf.LogFlagsToken
 		value  int      = 0
 		err    error
 	)
