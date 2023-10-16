@@ -17,7 +17,7 @@ const (
 	DefaultListenAddress      = ":8962"
 	DefaultEngine             = "file"
 	DefaultDataPath           = "./.data/dump"
-	DefaultKeyDiscardInterval = 10 * time.Second
+	DefaultKeyDiscardInterval = 90 * time.Second
 	DefaultKeyDiscardRatio    = 0.7
 	DefaultLogFlags           = log.Lmsgprefix | log.LstdFlags
 
