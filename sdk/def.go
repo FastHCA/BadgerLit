@@ -10,6 +10,7 @@ const (
 	ErrNonInteger          = Error("value is not an integer or out of range")
 	ErrDatabaseUnavailable = Error("database is unavailable")
 	ErrNil                 = Error("nil")
+	ErrViolateConstraints  = Error("violate constraints")
 
 	UNSET_LEASE = -1
 	NONE_TTL    = 0
@@ -36,8 +37,8 @@ type (
 
 		Get(key []byte) ([]byte, error)
 		Set(key []byte, value []byte) error
-		IncrBy(key []byte, increment int64) (int64, error)
-		IncrByFloat(key []byte, increment float64) (float64, error)
+		IncrBy(key []byte, increment int64, constraints ...Constraint[int64]) (int64, error)
+		IncrByFloat(key []byte, increment float64, constraints ...Constraint[float64]) (float64, error)
 
 		Scan(cursor []byte, opts ScanOptions) ([][]byte, error)
 		Ttl(key []byte) (ok bool, ttl int64, err error)
@@ -56,5 +57,9 @@ type (
 		PrefetchSize   int
 		Prefix         []byte
 		Reverse        bool
+	}
+
+	Constraint[T comparable] interface {
+		Check(v T) bool
 	}
 )

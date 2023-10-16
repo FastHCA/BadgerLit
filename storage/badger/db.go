@@ -193,7 +193,7 @@ func (db *DB) Get(key []byte) ([]byte, error) {
 }
 
 // IncrBy implements sdk.Storage.
-func (db *DB) IncrBy(key []byte, increment int64) (int64, error) {
+func (db *DB) IncrBy(key []byte, increment int64, constraints ...sdk.Constraint[int64]) (int64, error) {
 	if !db.running {
 		return 0, sdk.ErrDatabaseUnavailable
 	}
@@ -228,6 +228,14 @@ func (db *DB) IncrBy(key []byte, increment int64) (int64, error) {
 			// add increment & export
 			result = number + increment
 
+			// check
+			for _, constraint := range constraints {
+				ok := constraint.Check(result)
+				if !ok {
+					return sdk.ErrViolateConstraints
+				}
+			}
+
 			// export
 			value = []byte(strconv.FormatInt(result, 10))
 		}
@@ -239,7 +247,7 @@ func (db *DB) IncrBy(key []byte, increment int64) (int64, error) {
 }
 
 // IncrByFloat implements sdk.Storage.
-func (db *DB) IncrByFloat(key []byte, increment float64) (float64, error) {
+func (db *DB) IncrByFloat(key []byte, increment float64, constraints ...sdk.Constraint[float64]) (float64, error) {
 	if !db.running {
 		return 0, sdk.ErrDatabaseUnavailable
 	}
@@ -273,6 +281,14 @@ func (db *DB) IncrByFloat(key []byte, increment float64) (float64, error) {
 
 			// add increment & export
 			result = number + increment
+
+			// check
+			for _, constraint := range constraints {
+				ok := constraint.Check(result)
+				if !ok {
+					return sdk.ErrViolateConstraints
+				}
+			}
 
 			// export
 			value = []byte(strconv.FormatFloat(result, 'f', 4, 64))

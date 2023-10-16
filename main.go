@@ -118,14 +118,59 @@ func main() {
 		return true
 	})
 	s.HandleFunc("IncrBy", func(conn *resp.Conn, args []resp.Value) bool {
-		if len(args) != 3 {
+		if len(args) < 3 {
 			conn.WriteError(errors.New("ERR wrong number of arguments for 'IncrBy' command"))
 		} else {
 			var (
 				name  = args[1].Bytes()
 				value = int64(args[2].Integer())
+
+				constraints []sdk.Constraint[int64]
 			)
-			value, err := db.IncrBy(name, value)
+
+			for i := 2; i < len(args); i++ {
+				param := strings.ToUpper(args[i].String())
+
+				switch param {
+				case "CONSTRAINT":
+					// is EOF?
+					if i+1 >= len(args) {
+						conn.WriteError(errors.New("ERR missing constraint type"))
+						return true
+					}
+					i++
+					constraintType := strings.ToUpper(args[i].String())
+					switch constraintType {
+					case "<=", "LE", "LESS_OR_EQUAL":
+						// is EOF?
+						if i+1 >= len(args) {
+							conn.WriteError(errors.New("ERR missing constraint criteria"))
+							return true
+						}
+						i++
+						var criteria int64 = int64(args[i].Integer())
+						constraints = append(constraints, sdk.IntegerLessOrEqual(criteria))
+					case ">=", "GE", "GREATER_OR_EQUAL":
+						// is EOF?
+						if i+1 >= len(args) {
+							conn.WriteError(errors.New("ERR missing constraint criteria"))
+							return true
+						}
+						i++
+						var criteria int64 = int64(args[i].Integer())
+						constraints = append(constraints, sdk.IntegerGreaterOrEqual(criteria))
+					case "NON_NEGATIVE":
+						constraints = append(constraints, sdk.IntegerNonNegativeValue())
+					case "NON_ZERO":
+						constraints = append(constraints, sdk.IntegerNonZero())
+					default:
+						conn.WriteError(errors.New(fmt.Sprintf("ERR unsupported constraint type '%s'", constraintType)))
+						return true
+					}
+				}
+			}
+
+			value, err := db.IncrBy(name, value, constraints...)
 			if err != nil {
 				conn.WriteError(err)
 				return true
@@ -135,14 +180,77 @@ func main() {
 		return true
 	})
 	s.HandleFunc("IncrByFloat", func(conn *resp.Conn, args []resp.Value) bool {
-		if len(args) != 3 {
+		if len(args) < 3 {
 			conn.WriteError(errors.New("ERR wrong number of arguments for 'IncrByFloat' command"))
 		} else {
 			var (
 				name  = args[1].Bytes()
 				value = args[2].Float()
+
+				constraints []sdk.Constraint[float64]
 			)
-			value, err := db.IncrByFloat(name, value)
+
+			for i := 2; i < len(args); i++ {
+				param := strings.ToUpper(args[i].String())
+
+				switch param {
+				case "CONSTRAINT":
+					// is EOF?
+					if i+1 >= len(args) {
+						conn.WriteError(errors.New("ERR missing constraint type"))
+						return true
+					}
+					i++
+					constraintType := strings.ToUpper(args[i].String())
+					switch constraintType {
+					case "<", "LT", "LESS":
+						// is EOF?
+						if i+1 >= len(args) {
+							conn.WriteError(errors.New("ERR missing constraint criteria"))
+							return true
+						}
+						i++
+						var criteria = args[i].Float()
+						constraints = append(constraints, sdk.NumberLess(criteria))
+					case "<=", "LE", "LESS_OR_EQUAL":
+						// is EOF?
+						if i+1 >= len(args) {
+							conn.WriteError(errors.New("ERR missing constraint criteria"))
+							return true
+						}
+						i++
+						var criteria = args[i].Float()
+						constraints = append(constraints, sdk.NumberLessOrEqual(criteria))
+					case ">", "GT", "GREATER":
+						// is EOF?
+						if i+1 >= len(args) {
+							conn.WriteError(errors.New("ERR missing constraint criteria"))
+							return true
+						}
+						i++
+						var criteria = args[i].Float()
+						constraints = append(constraints, sdk.NumberGreater(criteria))
+					case ">=", "GE", "GREATER_OR_EQUAL":
+						// is EOF?
+						if i+1 >= len(args) {
+							conn.WriteError(errors.New("ERR missing constraint criteria"))
+							return true
+						}
+						i++
+						var criteria = args[i].Float()
+						constraints = append(constraints, sdk.NumberGreaterOrEqual(criteria))
+					case "NON_NEGATIVE":
+						constraints = append(constraints, sdk.NumberNonNegativeValue())
+					case "NON_ZERO":
+						constraints = append(constraints, sdk.NumberNonZero())
+					default:
+						conn.WriteError(errors.New(fmt.Sprintf("ERR unsupported constraint type '%s'", constraintType)))
+						return true
+					}
+				}
+			}
+
+			value, err := db.IncrByFloat(name, value, constraints...)
 			if err != nil {
 				conn.WriteError(err)
 			} else {
@@ -188,8 +296,10 @@ func main() {
 					// is EOF?
 					if i+1 >= len(args) {
 						conn.WriteError(errors.New("ERR wrong number of arguments for 'Scan' command"))
+						return true
 					}
-					value := args[i+1]
+					i++
+					value := args[i]
 					opts.Prefix = value.Bytes()
 				case "WITH_REVERSE":
 					opts.Reverse = true
