@@ -284,6 +284,35 @@ func (db *DB) IncrByFloat(key []byte, increment float64) (float64, error) {
 	return result, err
 }
 
+// Persist implements sdk.Storage.
+func (db *DB) Persist(key []byte) (bool, error) {
+	if !db.running {
+		return false, sdk.ErrDatabaseUnavailable
+	}
+
+	err := db.db.Update(func(txn *badger.Txn) error {
+		item, err := txn.Get(key)
+		if err != nil {
+			return err
+		}
+
+		return item.Value(func(val []byte) error {
+			entry := badger.NewEntry(item.Key(), val).
+				WithDiscard()
+
+			return txn.SetEntry(entry)
+		})
+	})
+
+	if err != nil {
+		if errors.Is(err, badger.ErrKeyNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
 // Scan implements sdk.Storage.
 func (db *DB) Scan(cursor []byte, opts sdk.ScanOptions) ([][]byte, error) {
 	if !db.running {

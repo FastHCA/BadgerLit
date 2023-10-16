@@ -146,6 +146,26 @@ func main() {
 		}
 		return true
 	})
+	s.HandleFunc("Persist", func(conn *resp.Conn, args []resp.Value) bool {
+		if len(args) != 2 {
+			conn.WriteError(errors.New("ERR wrong number of arguments for 'Persist' command"))
+		} else {
+			var (
+				name = args[1].Bytes()
+			)
+			ok, err := db.Persist(name)
+			if err != nil {
+				conn.WriteError(err)
+			} else {
+				if ok {
+					conn.WriteInteger(1)
+				} else {
+					conn.WriteInteger(0)
+				}
+			}
+		}
+		return true
+	})
 	s.HandleFunc("Scan", func(conn *resp.Conn, args []resp.Value) bool {
 		if len(args) < 2 || len(args)%2 != 0 {
 			conn.WriteError(errors.New("ERR wrong number of arguments for 'Scan' command"))

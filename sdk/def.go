@@ -39,6 +39,7 @@ type (
 		Exists(key []byte) (bool, error)
 		Del(key []byte) error
 		Expire(key []byte, lease time.Duration) (bool, error)
+		Persist(key []byte) (bool, error)
 	}
 
 	ScanOption interface {
