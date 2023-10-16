@@ -1,3 +1,4 @@
+ListenAddress: :8926
 Engine: file
 DataPath: ./.data/dump
 KeyDiscardInterval: 10s

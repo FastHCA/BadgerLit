@@ -7,6 +7,7 @@ import (
 )
 
 type Config struct {
+	ListenAddress      string        `yaml:"ListenAddress"`
 	Engine             string        `yaml:"Engine"`
 	DataPath           string        `yaml:"DataPath"`
 	KeyDiscardInterval time.Duration `yaml:"KeyDiscardInterval"`

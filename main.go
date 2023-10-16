@@ -17,11 +17,16 @@ import (
 
 func main() {
 	var (
-		addr string = ":16379"
-		db   sdk.Storage
+		db sdk.Storage
 	)
 
-	conf := sdk.Config{}
+	conf := sdk.Config{
+		ListenAddress:      sdk.DefaultListenAddress,
+		Engine:             sdk.DefaultEngine,
+		DataPath:           sdk.DefaultDataPath,
+		KeyDiscardInterval: sdk.DefaultKeyDiscardInterval,
+		KeyDiscardRatio:    sdk.DefaultKeyDiscardRatio,
+	}
 
 	// load config
 	config.NewConfigurationService(&conf).
@@ -240,8 +245,8 @@ func main() {
 		return true
 	})
 
-	fmt.Printf("server start at %s\n", addr)
-	if err := s.ListenAndServe(addr); err != nil {
+	fmt.Printf("server start at %s\n", conf.ListenAddress)
+	if err := s.ListenAndServe(conf.ListenAddress); err != nil {
 		log.Fatal(err)
 	}
 }

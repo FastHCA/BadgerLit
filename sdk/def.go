@@ -14,7 +14,12 @@ const (
 	UNSET_LEASE = -1
 	NONE_TTL    = 0
 
-	DefaultLogFlags = log.Lmsgprefix | log.LstdFlags
+	DefaultListenAddress      = ":8926"
+	DefaultEngine             = "file"
+	DefaultDataPath           = "./.data/dump"
+	DefaultKeyDiscardInterval = 10 * time.Second
+	DefaultKeyDiscardRatio    = 0.7
+	DefaultLogFlags           = log.Lmsgprefix | log.LstdFlags
 
 	LOG_FLAG_TOKEN_DATE      = "date"
 	LOG_FLAG_TOKEN_TIME      = "time"
