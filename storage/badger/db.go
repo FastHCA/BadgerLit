@@ -319,7 +319,7 @@ func (db *DB) Scan(cursor []byte, opts sdk.ScanOptions) ([][]byte, error) {
 		return nil, sdk.ErrDatabaseUnavailable
 	}
 
-	var keys [][]byte
+	var kvs [][]byte
 
 	err := db.db.View(func(txn *badger.Txn) error {
 		iterOpts := badger.DefaultIteratorOptions
@@ -337,11 +337,21 @@ func (db *DB) Scan(cursor []byte, opts sdk.ScanOptions) ([][]byte, error) {
 		for ; iter.Valid(); iter.Next() {
 			item := iter.Item()
 
-			keys = append(keys, item.Key())
+			if iterOpts.PrefetchValues {
+				err := item.Value(func(val []byte) error {
+					kvs = append(kvs, item.Key(), val)
+					return nil
+				})
+				if err != nil {
+					return err
+				}
+			} else {
+				kvs = append(kvs, item.Key())
+			}
 		}
 		return nil
 	})
-	return keys, err
+	return kvs, err
 }
 
 // Set implements sdk.Storage.

@@ -172,7 +172,7 @@ func main() {
 		return true
 	})
 	s.HandleFunc("Scan", func(conn *resp.Conn, args []resp.Value) bool {
-		if len(args) < 2 || len(args)%2 != 0 {
+		if len(args) < 2 {
 			conn.WriteError(errors.New("ERR wrong number of arguments for 'Scan' command"))
 		} else {
 			var (
@@ -180,15 +180,21 @@ func main() {
 				opts   = sdk.ScanOptions{}
 			)
 
-			for i := 2; i < len(args); i += 2 {
+			for i := 2; i < len(args); i++ {
 				param := strings.ToUpper(args[i].String())
-				value := args[i+1]
 
 				switch param {
 				case "PREFIX":
+					// is EOF?
+					if i+1 >= len(args) {
+						conn.WriteError(errors.New("ERR wrong number of arguments for 'Scan' command"))
+					}
+					value := args[i+1]
 					opts.Prefix = value.Bytes()
-				case "REVERSE":
-					opts.Reverse = value.Bool()
+				case "WITH_REVERSE":
+					opts.Reverse = true
+				case "WITH_VALUE":
+					opts.PrefetchValues = true
 				}
 			}
 			keys, err := db.Scan(cursor, opts)
