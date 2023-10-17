@@ -5,6 +5,7 @@ import (
 	"badgerlit/storage/badger"
 	"context"
 	"errors"
+	"flag"
 	"fmt"
 	"log"
 	"strconv"
@@ -15,7 +16,15 @@ import (
 	"github.com/tidwall/resp"
 )
 
+var (
+	DefaultConfigFile = "config.yaml"
+
+	configFile = flag.String("config", DefaultConfigFile, "specified config file. Default: config.yaml")
+)
+
 func main() {
+	flag.Parse()
+
 	var (
 		db sdk.Storage
 	)
@@ -30,7 +39,7 @@ func main() {
 
 	// load config
 	config.NewConfigurationService(&conf).
-		LoadYamlFile(`config.yaml`).Output()
+		LoadYamlFile(*configFile).Output()
 
 	// setup storage
 	db = badger.New(&conf)
