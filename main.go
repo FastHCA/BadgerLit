@@ -122,8 +122,8 @@ func main() {
 			conn.WriteError(errors.New("ERR wrong number of arguments for 'IncrBy' command"))
 		} else {
 			var (
-				name  = args[1].Bytes()
-				value = int64(args[2].Integer())
+				name      = args[1].Bytes()
+				increment = int64(args[2].Integer())
 
 				constraints []sdk.Constraint[int64]
 			)
@@ -170,7 +170,7 @@ func main() {
 				}
 			}
 
-			value, err := db.IncrBy(name, value, constraints...)
+			value, err := db.IncrBy(name, increment, constraints...)
 			if err != nil {
 				conn.WriteError(err)
 				return true
@@ -184,8 +184,8 @@ func main() {
 			conn.WriteError(errors.New("ERR wrong number of arguments for 'IncrByFloat' command"))
 		} else {
 			var (
-				name  = args[1].Bytes()
-				value = args[2].Float()
+				name      = args[1].Bytes()
+				increment = args[2].Float()
 
 				constraints []sdk.Constraint[float64]
 			)
@@ -250,7 +250,7 @@ func main() {
 				}
 			}
 
-			value, err := db.IncrByFloat(name, value, constraints...)
+			value, err := db.IncrByFloat(name, increment, constraints...)
 			if err != nil {
 				conn.WriteError(err)
 			} else {

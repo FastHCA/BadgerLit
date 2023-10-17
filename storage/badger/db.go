@@ -212,17 +212,19 @@ func (db *DB) IncrBy(key []byte, increment int64, constraints ...sdk.Constraint[
 		{
 			var number int64 = 0
 
-			err = item.Value(func(val []byte) error {
-				n, err := strconv.ParseInt(string(val), 10, 64)
-				if err != nil {
-					return sdk.ErrNonInteger
-				}
+			if item != nil {
+				err = item.Value(func(val []byte) error {
+					n, err := strconv.ParseInt(string(val), 10, 64)
+					if err != nil {
+						return sdk.ErrNonInteger
+					}
 
-				number = n
-				return nil
-			})
-			if err != nil {
-				return err
+					number = n
+					return nil
+				})
+				if err != nil {
+					return err
+				}
 			}
 
 			// add increment & export
@@ -266,17 +268,19 @@ func (db *DB) IncrByFloat(key []byte, increment float64, constraints ...sdk.Cons
 		{
 			var number float64 = 0
 
-			err = item.Value(func(val []byte) error {
-				n, err := strconv.ParseFloat(string(val), 64)
-				if err != nil {
-					return sdk.ErrNonInteger
-				}
+			if item != nil {
+				err = item.Value(func(val []byte) error {
+					n, err := strconv.ParseFloat(string(val), 64)
+					if err != nil {
+						return sdk.ErrNonInteger
+					}
 
-				number = n
-				return nil
-			})
-			if err != nil {
-				return err
+					number = n
+					return nil
+				})
+				if err != nil {
+					return err
+				}
 			}
 
 			// add increment & export

@@ -1,7 +1,7 @@
 ListenAddress: :8962
 Engine: file
 DataPath: ./.data/dump
-KeyDiscardInterval: 10s
+KeyDiscardInterval: 90s
 KeyDiscardRatio: 0.7
 LogFlags:
   - default
