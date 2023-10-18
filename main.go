@@ -372,8 +372,8 @@ func main() {
 	})
 
 	s.HandleFunc("Shutdown", func(conn *resp.Conn, args []resp.Value) bool {
-		fmt.Println("SHUTDOWN!!")
 		conn.WriteSimpleString("OK")
+		db.Stop(context.Background())
 		os.Exit(0)
 		return false
 	})
