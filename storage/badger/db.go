@@ -97,6 +97,7 @@ func (db *DB) Stop(ctx context.Context) {
 		db.running = false
 		db.keyDiscardTask.stop()
 
+		db.db.Close()
 		db.logger.Infof("Stopped")
 	}
 }

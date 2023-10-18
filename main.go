@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -368,6 +369,13 @@ func main() {
 
 		}
 		return true
+	})
+
+	s.HandleFunc("Shutdown", func(conn *resp.Conn, args []resp.Value) bool {
+		fmt.Println("SHUTDOWN!!")
+		conn.WriteSimpleString("OK")
+		os.Exit(0)
+		return false
 	})
 
 	fmt.Printf("server start at %s\n", conf.ListenAddress)
