@@ -359,13 +359,18 @@ func (db *DB) Scan(cursor []byte, opts sdk.ScanOptions) ([][]byte, error) {
 			item := iter.Item()
 
 			if iterOpts.PrefetchValues {
-				err := item.Value(func(val []byte) error {
-					kvs = append(kvs, item.KeyCopy(nil), val)
-					return nil
-				})
+				if item.ValueSize() == 0 {
+					continue
+				}
+
+				var val []byte = make([]byte, item.ValueSize())
+
+				_, err := item.ValueCopy(val)
 				if err != nil {
 					return err
 				}
+
+				kvs = append(kvs, item.KeyCopy(nil), val)
 			} else {
 				item.Key()
 				kvs = append(kvs, item.KeyCopy(nil))
