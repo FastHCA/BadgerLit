@@ -343,8 +343,12 @@ func main() {
 				name  = args[1].Bytes()
 				value = args[2].Bytes()
 			)
-			db.Set(name, value)
-			conn.WriteSimpleString("OK")
+			err := db.Set(name, value)
+			if err != nil {
+				conn.WriteError(err)
+			} else {
+				conn.WriteSimpleString("OK")
+			}
 		}
 		return true
 	})
