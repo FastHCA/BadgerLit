@@ -42,6 +42,10 @@ func main() {
 	config.NewConfigurationService(&conf).
 		LoadYamlFile(*configFile).Output()
 
+	if err := conf.Validate(); err != nil {
+		panic(err)
+	}
+
 	// setup storage
 	db = badger.New(&conf)
 	db.Start(context.Background())

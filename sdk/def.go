@@ -15,6 +15,9 @@ const (
 	UNSET_LEASE = -1
 	NONE_TTL    = 0
 
+	ENGINE_FILE   = "file"
+	ENGINE_MEMORY = "memory"
+
 	DefaultListenAddress      = ":8962"
 	DefaultEngine             = "file"
 	DefaultDataPath           = "./.data/dump"

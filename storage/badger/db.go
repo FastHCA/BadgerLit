@@ -43,8 +43,16 @@ func New(config *sdk.Config) *DB {
 	}
 
 	// badger.Options
-	opts := badger.DefaultOptions(config.DataPath).
-		WithLogger(logger)
+	var opts badger.Options
+	switch config.Engine {
+	case sdk.ENGINE_FILE:
+		opts = badger.DefaultOptions(config.DataPath).
+			WithIndexCacheSize(100 << 20)
+	case sdk.ENGINE_MEMORY:
+		opts = badger.DefaultOptions("").
+			WithInMemory(true)
+	}
+	opts.WithLogger(logger)
 
 	// badger.DB
 	badgerDB, err := badger.Open(opts)

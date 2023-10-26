@@ -56,3 +56,18 @@ func (conf *Config) LogFlags() (int, error) {
 
 	return value, err
 }
+
+func (conf *Config) Validate() error {
+	switch conf.Engine {
+	case ENGINE_MEMORY:
+		// skipped
+	case ENGINE_FILE:
+		if conf.DataPath == "" {
+			return fmt.Errorf("config error: missing DataPath")
+		}
+	default:
+		return fmt.Errorf("config error: unsupported Engine '%s'", conf.Engine)
+	}
+
+	return nil
+}
